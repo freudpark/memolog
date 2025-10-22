@@ -1,4 +1,3 @@
-```tsx
 'use client';
 import { useEffect, useMemo, useState } from 'react';
 import { WORK_TYPES, WorkType } from '@/utils/workTypes';
@@ -107,4 +106,3 @@ export default function Page() {
     </div>
   );
 }
-```
