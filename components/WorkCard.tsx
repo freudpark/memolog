@@ -1,4 +1,3 @@
-```tsx
 'use client';
 import { useState, useEffect } from 'react';
 import type { WorkType } from '@/utils/workTypes';
@@ -116,4 +115,3 @@ export default function WorkCard({ name, baseDate, workType }: Props) {
     </div>
   );
 }
-```
