@@ -1,5 +1,9 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",                // ✅ 절대경로 alias 활성화
+    "paths": {                     // ✅ @/ 경로를 root로 인식
+      "@/*": ["./*"]
+    },
     "target": "es2017",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
