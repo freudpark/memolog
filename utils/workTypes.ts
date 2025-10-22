@@ -1,4 +1,3 @@
-```ts
 export const WORK_TYPES = [
   '사업/품질',
   '인프라구축',
@@ -8,4 +7,3 @@ export const WORK_TYPES = [
 ] as const;
 
 export type WorkType = typeof WORK_TYPES[number];
-```
