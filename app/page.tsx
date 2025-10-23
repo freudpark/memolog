@@ -1,6 +1,5 @@
 'use client';
 import { useState } from 'react';
-import { supabase } from '@/lib/supabase';
 import DailyTable from '@/components/DailyTable';
 
 function yyyymmdd(date: Date) {
@@ -14,8 +13,13 @@ export default function Page() {
   const [name, setName] = useState('');
   const [loggedIn, setLoggedIn] = useState(false);
 
-  async function login(e?: React.FormEvent) {
-    if (e) e.preventDefault(); // 엔터 시 리프레시 방지
+  const today = new Date();
+  const baseDate = yyyymmdd(today);
+  const fullDate = today.toLocaleDateString();
+
+  // ✅ 인증 없이 로그인
+  function login(e?: React.FormEvent) {
+    if (e) e.preventDefault();
 
     const userName = name.trim();
     if (!userName) {
@@ -23,34 +27,26 @@ export default function Page() {
       return;
     }
 
-    // DB에서 사용자 존재 여부 확인
-    const { data, error } = await supabase
-      .from('users')
-      .select('name')
-      .eq('name', userName)
-      .maybeSingle(); // 값 없으면 null 반환
-
-    if (!data || error) {
-      alert('사용자가 등록되지 않았습니다.');
-      return;
-    }
-
-    // 로그인 성공
     localStorage.setItem('name', userName);
     setLoggedIn(true);
   }
 
+  // ✅ 로그아웃
   function logout() {
     localStorage.removeItem('name');
     setLoggedIn(false);
   }
 
+  // ✅ 로그인 화면
   if (!loggedIn) {
     return (
       <div className="login-wrap">
         <img src="/goe.png" className="login-logo" alt="경기도교육청 로고" />
         <div className="login-box">
           <h2>일일업무 로그인</h2>
+          <div style={{ fontSize: '13px', color: '#555', marginBottom: '8px' }}>
+            기준일자 : {fullDate} (YYMMDD: {baseDate})
+          </div>
 
           <form onSubmit={login}>
             <input
@@ -60,7 +56,9 @@ export default function Page() {
               onChange={(e) => setName(e.target.value)}
               autoFocus
             />
-            <button type="submit" className="login-btn">로그인</button>
+            <button type="submit" className="login-btn">
+              로그인
+            </button>
           </form>
         </div>
         <img src="/itcen.png" className="login-footer-logo" alt="아이티센 로고" />
@@ -68,13 +66,11 @@ export default function Page() {
     );
   }
 
-  // 기준일: 오늘 (테이블 내부에서 이동 제어)
-  const baseDate = yyyymmdd(new Date());
-
+  // ✅ 메인 화면
   return (
     <div className="wrap">
       <DailyTable name={name} baseDate={baseDate} />
-      <div className="logout-box" style={{ textAlign: 'right', marginTop: 12 }}>
+      <div style={{ textAlign: 'right', marginTop: 12 }}>
         <button onClick={logout}>로그아웃</button>
       </div>
     </div>
