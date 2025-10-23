@@ -39,11 +39,11 @@ export default function DailyTable({ name, baseDate }: Props) {
       Number(currentDate.slice(2, 4)) - 1,
       Number(currentDate.slice(4, 6))
     );
-    return dt.getFullYear() + '.' + (dt.getMonth() + 1) + '.' + dt.getDate();
+    return `${dt.getFullYear()}.${dt.getMonth() + 1}.${dt.getDate()}`;
   }, [currentDate]);
 
   async function loadAll(targetDate: string) {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('memos')
       .select('*')
       .eq('name', name)
@@ -52,22 +52,21 @@ export default function DailyTable({ name, baseDate }: Props) {
     const nextRows: any = {};
     WORK_TYPES.forEach((w) => (nextRows[w] = { today: '', tomorrow: '' }));
 
-    if (!error && data) {
-      data.forEach((row) => {
-        if (WORK_TYPES.includes(row.work_type)) {
-          nextRows[row.work_type] = {
-            today: row.today_content || '',
-            tomorrow: row.tomorrow_content || '',
-          };
-        }
-        if (row.work_type === MEETING_TYPE) {
-          setMeeting({
-            today: row.today_content || '',
-            tomorrow: row.tomorrow_content || '',
-          });
-        }
-      });
-    }
+    data?.forEach((row) => {
+      if (WORK_TYPES.includes(row.work_type)) {
+        nextRows[row.work_type] = {
+          today: row.today_content || '',
+          tomorrow: row.tomorrow_content || '',
+        };
+      }
+      if (row.work_type === MEETING_TYPE) {
+        setMeeting({
+          today: row.today_content || '',
+          tomorrow: row.tomorrow_content || '',
+        });
+      }
+    });
+
     setRows(nextRows);
   }
 
@@ -103,18 +102,13 @@ export default function DailyTable({ name, baseDate }: Props) {
 
   return (
     <>
-      {/* 로고 */}
-      <div className="logo-wrap">
-        <img src="/goe.png" className="goe-main-logo" alt="경기도교육청 로고" />
+      <div className="logo-wrap-auth">
+        <img src="/goe.png" className="goe-main-logo-auth" />
+        <h1 className="main-title">정보자원통합 일일현황</h1>
       </div>
 
-      {/* 제목 */}
-      <h1 className="title-center">정보자원통합 일일현황</h1>
+      <div className="date-label-main">오늘 날짜 : {currentDateLabel}</div>
 
-      {/* 날짜 */}
-      <div className="date-strong">오늘날짜 : {currentDateLabel}</div>
-
-      {/* 테이블 */}
       <div className="sheet">
         <div className="sheet-header">
           <div className="c-area">업무분야</div>
@@ -147,28 +141,22 @@ export default function DailyTable({ name, baseDate }: Props) {
         ))}
       </div>
 
-      {/* 회의 */}
       <div className="meeting">
         <div className="meeting-head">회의/협의 일정</div>
         <div className="meeting-grid">
-          <div>
-            <textarea
-              className="ta"
-              value={meeting.today}
-              onChange={(e) => setMeeting((p) => ({ ...p, today: e.target.value }))}
-            />
-          </div>
-          <div>
-            <textarea
-              className="ta"
-              value={meeting.tomorrow}
-              onChange={(e) => setMeeting((p) => ({ ...p, tomorrow: e.target.value }))}
-            />
-          </div>
+          <textarea
+            className="ta"
+            value={meeting.today}
+            onChange={(e) => setMeeting((p) => ({ ...p, today: e.target.value }))}
+          />
+          <textarea
+            className="ta"
+            value={meeting.tomorrow}
+            onChange={(e) => setMeeting((p) => ({ ...p, tomorrow: e.target.value }))}
+          />
         </div>
       </div>
 
-      {/* 날짜 이동 */}
       <div className="nav-wrap">
         <button className="nav-btn prev" onClick={() => setCurrentDate((d) => shiftYYMMDD(d, -1))}>
           ◀ 이전
@@ -178,12 +166,10 @@ export default function DailyTable({ name, baseDate }: Props) {
         </button>
       </div>
 
-      {/* 저장 */}
       <div className="save-wrap">
         <button className="save-btn-small" onClick={saveAll}>저장</button>
       </div>
 
-      {/* 조회자 */}
       <div className="viewer">조회자 : {name}</div>
     </>
   );
