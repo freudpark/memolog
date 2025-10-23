@@ -1,9 +1,8 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
-import { WORK_TYPES, WorkType } from '@/utils/workTypes';
-import WorkCard from '@/components/WorkCard';
+import DailyTable from '@/components/DailyTable';
 
-function yyyymmddToYYMMDD(date: Date) {
+function yyyymmdd(date: Date) {
   const y = date.getFullYear().toString().slice(-2);
   const m = String(date.getMonth() + 1).padStart(2, '0');
   const d = String(date.getDate()).padStart(2, '0');
@@ -12,10 +11,9 @@ function yyyymmddToYYMMDD(date: Date) {
 
 export default function Page() {
   const [name, setName] = useState('');
-  const [baseDate, setBaseDate] = useState(''); // YYMMDD 문자열 입력
+  const [baseDate, setBaseDate] = useState(''); // YYMMDD
   const [loggedIn, setLoggedIn] = useState(false);
 
-  // 최초 접속 시 로컬 저장값 불러오기
   useEffect(() => {
     const n = localStorage.getItem('memolog:name');
     const d = localStorage.getItem('memolog:baseDate');
@@ -24,83 +22,65 @@ export default function Page() {
     if (n && d) setLoggedIn(true);
   }, []);
 
-  const todayHuman = useMemo(() => {
-    if (!baseDate || baseDate.length !== 6) return '';
-    const fullYear = Number('20' + baseDate.slice(0, 2));
-    const month = Number(baseDate.slice(2, 4)) - 1;
-    const day = Number(baseDate.slice(4, 6));
-    const dt = new Date(fullYear, month, day);
+  const fullDate = useMemo(() => {
+    if (!/^\d{6}$/.test(baseDate)) return '';
+    const dt = new Date(Number('20' + baseDate.slice(0, 2)), Number(baseDate.slice(2, 4)) - 1, Number(baseDate.slice(4, 6)));
     return dt.toLocaleDateString();
   }, [baseDate]);
 
   function handleLogin() {
-    if (!name.trim()) {
-      alert('이름을 입력하세요');
-      return;
-    }
-    if (!/^\d{6}$/.test(baseDate)) {
-      alert('날짜는 YYMMDD 형식으로 입력하세요 (예: ' + yyyymmddToYYMMDD(new Date()) + ')');
-      return;
-    }
+    if (!name.trim()) return alert('이름을 입력하세요');
+    if (!/^\d{6}$/.test(baseDate)) return alert('날짜는 YYMMDD 형식입니다. 예: ' + yyyymmdd(new Date()));
     localStorage.setItem('memolog:name', name.trim());
     localStorage.setItem('memolog:baseDate', baseDate);
     setLoggedIn(true);
   }
-
-  function handleLogout() {
-    setLoggedIn(false);
-  }
+  function handleLogout() { setLoggedIn(false); }
 
   return (
     <div className="container">
-      <div className="header">
-        <h1>오늘/내일 메모 보고</h1>
-        {loggedIn && (
-          <div className="badge">기준일: {todayHuman} (YYMMDD: {baseDate})</div>
-        )}
-      </div>
-
       {!loggedIn ? (
-        <div className="rounded-2xl bg-white border p-4">
-          <div className="grid gap-3">
-            <div>
-              <label className="block text-sm text-gray-600 mb-1">이름</label>
-              <input className="input" placeholder="예: 홍길동" value={name} onChange={(e) => setName(e.target.value)} />
+        <div className="login-wrap">
+          <div className="card">
+            <h2>정보자원통합 · 일일 업무보고</h2>
+            <div className="row">
+              <div style={{ flex: 1 }}>
+                <div className="lb">조회자 성명</div>
+                <input className="input" placeholder="성명입력" value={name} onChange={(e) => setName(e.target.value)} />
+              </div>
+              <div style={{ flex: 1 }}>
+                <div className="lb">기준일자 (YYMMDD)</div>
+                <input className="input" placeholder={yyyymmdd(new Date())} value={baseDate} onChange={(e) => setBaseDate(e.target.value)} />
+              </div>
             </div>
-            <div>
-              <label className="block text-sm text-gray-600 mb-1">날짜 (YYMMDD)</label>
-              <input className="input" placeholder="예: 251022" value={baseDate} onChange={(e) => setBaseDate(e.target.value)} />
-            </div>
-            <div className="row" style={{ justifyContent: 'flex-end' }}>
-              <button onClick={handleLogin} className="px-4 py-2 rounded-xl bg-black text-white">로그인</button>
+            <div style={{ display:'flex', justifyContent:'flex-end', marginTop:12 }}>
+              <button className="btn" onClick={handleLogin}>로그인 / 조회</button>
             </div>
           </div>
         </div>
       ) : (
         <>
-          <div className="rounded-2xl bg-white border p-3 mb-3">
+          {/* 옵션 B: 상단 Summary 박스 */}
+          <div className="card" style={{ marginBottom: 16 }}>
             <div className="row">
-              <div className="flex-1">
-                <div className="text-sm text-gray-600">사용자</div>
-                <div className="font-semibold">{name}</div>
+              <div style={{ flex:1 }}>
+                <div className="lb">사용자</div>
+                <div style={{ fontWeight:700 }}>{name}</div>
               </div>
-              <div className="flex-1">
-                <div className="text-sm text-gray-600">기준일(YYMMDD)</div>
-                <div className="font-semibold">{baseDate}</div>
+              <div style={{ flex:1 }}>
+                <div className="lb">기준일</div>
+                <div style={{ fontWeight:700 }}>{fullDate} (YYMMDD: {baseDate})</div>
               </div>
               <div>
-                <button onClick={handleLogout} className="px-3 py-2 rounded-xl border">로그아웃</button>
+                <button className="btn" onClick={handleLogout}>로그아웃</button>
               </div>
             </div>
           </div>
 
-          <div className="card-grid">
-            {WORK_TYPES.map((w) => (
-              <WorkCard key={w} name={name} baseDate={baseDate} workType={w as WorkType} />
-            ))}
-          </div>
+          {/* 하이브리드 모던 테이블 */}
+          <DailyTable name={name} baseDate={baseDate} />
 
-          <div className="footer">© 오늘/내일 메모 보고 — Vercel + Supabase</div>
+          <div className="footer">© 일일 업무 보고 — Vercel + Supabase</div>
         </>
       )}
     </div>
