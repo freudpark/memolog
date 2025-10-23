@@ -3,7 +3,14 @@ export const metadata = {
   description: '업무 메모 공유 시스템',
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+// ✅ 이 줄이 반드시 필요!
+import './globals.css';
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="ko">
       <body>{children}</body>
