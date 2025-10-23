@@ -16,12 +16,13 @@ export default function Page() {
   const baseDate = yyyymmdd(new Date());
 
   async function login() {
-    if (!name.trim()) return alert('이름을 입력하세요');
+    const userName = name.trim();
+    if (!userName) return alert('이름을 입력하세요');
 
     const { data } = await supabase
       .from('users')
       .select('*')
-      .eq('name', name.trim())
+      .eq('name', userName)
       .single();
 
     if (!data) {
@@ -29,7 +30,7 @@ export default function Page() {
       return;
     }
 
-    localStorage.setItem('name', name.trim());
+    localStorage.setItem('name', userName);
     setLoggedIn(true);
   }
 
@@ -41,15 +42,18 @@ export default function Page() {
   if (!loggedIn) {
     return (
       <div className="login-wrap">
+        <img src="/goe.png" className="login-logo" />
         <div className="login-box">
-          <h2>업무일지 로그인</h2>
+          <h2>일일업무 로그인</h2>
           <input
-            placeholder="이름"
+            className="login-input"
+            placeholder="이름을 입력하세요"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
-          <button onClick={login}>로그인</button>
+          <button className="login-btn" onClick={login}>로그인</button>
         </div>
+        <img src="/itcen.png" className="login-footer-logo" />
       </div>
     );
   }
