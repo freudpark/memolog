@@ -5,7 +5,7 @@ import { WORK_TYPES, type WorkType, MEETING_TYPE } from '@/utils/workTypes';
 
 interface Props {
   name: string;
-  baseDate: string; // 초기값(오늘)
+  baseDate: string;
 }
 
 type RowState = {
@@ -25,9 +25,7 @@ function shiftYYMMDD(yyMMdd: string, deltaDays: number) {
 }
 
 export default function DailyTable({ name, baseDate }: Props) {
-  // 화면 내에서 기준일 이동을 위한 state
   const [currentDate, setCurrentDate] = useState(baseDate);
-
   const [rows, setRows] = useState<RowState>(() => {
     const init: any = {};
     WORK_TYPES.forEach((w) => (init[w] = { today: '', tomorrow: '' }));
@@ -35,14 +33,13 @@ export default function DailyTable({ name, baseDate }: Props) {
   });
   const [meeting, setMeeting] = useState({ today: '', tomorrow: '' });
 
-  // 가독용: 20YY-MM-DD 표기
   const currentDateLabel = useMemo(() => {
     const dt = new Date(
       Number('20' + currentDate.slice(0, 2)),
       Number(currentDate.slice(2, 4)) - 1,
       Number(currentDate.slice(4, 6))
     );
-    return dt.toLocaleDateString();
+    return dt.getFullYear() + '.' + (dt.getMonth() + 1) + '.' + dt.getDate();
   }, [currentDate]);
 
   async function loadAll(targetDate: string) {
@@ -93,11 +90,11 @@ export default function DailyTable({ name, baseDate }: Props) {
         tomorrow_content: meeting.tomorrow,
       }),
     ]);
-    alert('✅ 전체 저장 완료');
+    alert('✅ 저장되었습니다');
   }
 
   useEffect(() => {
-    setCurrentDate(baseDate); // 로그인 후 초기화
+    setCurrentDate(baseDate);
   }, [baseDate]);
 
   useEffect(() => {
@@ -106,12 +103,16 @@ export default function DailyTable({ name, baseDate }: Props) {
 
   return (
     <>
-      {/* 로고 1줄 + 제목 1줄 (좌측 정렬) */}
-      <img src="/goe.png" className="goe-main-logo" alt="경기도교육청 로고" />
-      <h1 className="title-left">경기도교육청 정보자원 일일업무내용</h1>
+      {/* 상단 로고 (3배 확대, 중앙정렬) */}
+      <div className="logo-wrap">
+        <img src="/goe.png" className="goe-main-logo" alt="경기도교육청 로고" />
+      </div>
 
-      {/* 기준일(내부 표기용) */}
-      <div className="date-hint">{currentDateLabel} (YYMMDD: {currentDate})</div>
+      {/* 제목 */}
+      <h1 className="title-center">정보자원통합 일일현황</h1>
+
+      {/* 날짜 (중앙 정렬, 2배, bold) */}
+      <div className="date-strong">오늘날짜 : {currentDateLabel}</div>
 
       {/* 테이블 */}
       <div className="sheet">
@@ -126,7 +127,7 @@ export default function DailyTable({ name, baseDate }: Props) {
             <div className="c-area"><strong>{w}</strong></div>
 
             <div className="c-day">
-              <div className="cell-label">오늘</div>{/* 모바일에서 라벨 유지 */}
+              <div className="cell-label">오늘</div>
               <textarea
                 className="ta"
                 value={rows[w].today}
@@ -137,7 +138,7 @@ export default function DailyTable({ name, baseDate }: Props) {
             </div>
 
             <div className="c-day">
-              <div className="cell-label">내일</div>{/* 모바일에서 라벨 유지 */}
+              <div className="cell-label">내일</div>
               <textarea
                 className="ta"
                 value={rows[w].tomorrow}
@@ -173,7 +174,7 @@ export default function DailyTable({ name, baseDate }: Props) {
         </div>
       </div>
 
-      {/* 날짜 이동 (B2: 테이블·회의 아래) — L2 문구, C1 색상 */}
+      {/* 날짜 이동 버튼 */}
       <div className="nav-wrap">
         <button
           className="nav-btn prev"
@@ -189,12 +190,11 @@ export default function DailyTable({ name, baseDate }: Props) {
         </button>
       </div>
 
-      {/* 저장 버튼 */}
+      {/* 저장 버튼 (크기 1/2로 축소) */}
       <div className="save-wrap">
-        <button className="save-btn" onClick={saveAll}>전체 저장</button>
+        <button className="save-btn-small" onClick={saveAll}>저장</button>
       </div>
 
-      {/* 조회자 */}
       <div className="viewer">조회자 : {name}</div>
     </>
   );
