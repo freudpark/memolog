@@ -77,10 +77,9 @@ export default function DailyTable({ name, baseDate }: Props) {
 
   return (
     <>
-      {/* 제목 */}
-      <h1 className="title-center">경기도교육청 정보자원 일일업무내용</h1>
+      <img src="/goe.png" className="goe-main-logo" />
+      <h1 className="title-left">경기도교육청 정보자원 일일업무내용</h1>
 
-      {/* 테이블 */}
       <div className="sheet">
         <div className="sheet-header">
           <div className="c-area">업무분야</div>
@@ -113,7 +112,6 @@ export default function DailyTable({ name, baseDate }: Props) {
         ))}
       </div>
 
-      {/* 회의/협의 */}
       <div className="meeting">
         <div className="meeting-head">회의/협의 일정</div>
         <div className="meeting-grid">
@@ -136,12 +134,10 @@ export default function DailyTable({ name, baseDate }: Props) {
         </div>
       </div>
 
-      {/* 저장 버튼 */}
       <div className="save-wrap">
         <button className="save-btn" onClick={saveAll}>전체 저장</button>
       </div>
 
-      {/* 조회자 */}
       <div className="viewer">조회자 : {name}</div>
     </>
   );
