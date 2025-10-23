@@ -12,7 +12,7 @@ type RowState = {
   [key in WorkType]: { today: string; tomorrow: string };
 };
 
-function shiftYYMMDD(yyMMdd: string, deltaDays: number) {
+function shift(yyMMdd: string, deltaDays: number) {
   const y = Number('20' + yyMMdd.slice(0, 2));
   const m = Number(yyMMdd.slice(2, 4)) - 1;
   const d = Number(yyMMdd.slice(4, 6));
@@ -33,7 +33,7 @@ export default function DailyTable({ name, baseDate }: Props) {
   });
   const [meeting, setMeeting] = useState({ today: '', tomorrow: '' });
 
-  const currentDateLabel = useMemo(() => {
+  const label = useMemo(() => {
     const dt = new Date(
       Number('20' + currentDate.slice(0, 2)),
       Number(currentDate.slice(2, 4)) - 1,
@@ -42,12 +42,8 @@ export default function DailyTable({ name, baseDate }: Props) {
     return `${dt.getFullYear()}.${dt.getMonth() + 1}.${dt.getDate()}`;
   }, [currentDate]);
 
-  async function loadAll(targetDate: string) {
-    const { data } = await supabase
-      .from('memos')
-      .select('*')
-      .eq('name', name)
-      .eq('base_date', targetDate);
+  async function loadAll(date: string) {
+    const { data } = await supabase.from('memos').select('*').eq('name', name).eq('base_date', date);
 
     const nextRows: any = {};
     WORK_TYPES.forEach((w) => (nextRows[w] = { today: '', tomorrow: '' }));
@@ -92,51 +88,37 @@ export default function DailyTable({ name, baseDate }: Props) {
     alert('✅ 저장되었습니다');
   }
 
-  useEffect(() => {
-    setCurrentDate(baseDate);
-  }, [baseDate]);
-
-  useEffect(() => {
-    loadAll(currentDate);
-  }, [name, currentDate]);
+  useEffect(() => { loadAll(currentDate); }, [currentDate]);
 
   return (
     <>
-      <div className="logo-wrap-auth">
-        <img src="/goe.png" className="goe-main-logo-auth" />
-        <h1 className="main-title">정보자원통합 일일현황</h1>
-      </div>
-
-      <div className="date-label-main">오늘 날짜 : {currentDateLabel}</div>
+      <h1 className="main-title">정보자원통합 일일현황</h1>
+      <div className="date-label-main">오늘 날짜 : {label}</div>
 
       <div className="sheet">
         <div className="sheet-header">
-          <div className="c-area">업무분야</div>
-          <div className="c-day">오늘</div>
-          <div className="c-day">내일</div>
+          <div>업무분야</div>
+          <div>오늘</div>
+          <div>내일</div>
         </div>
 
         {WORK_TYPES.map((w) => (
           <div className="sheet-row" key={w}>
-            <div className="c-area"><strong>{w}</strong></div>
-            <div className="c-day">
-              <textarea
-                className="ta"
-                value={rows[w].today}
-                onChange={(e) =>
-                  setRows((p) => ({ ...p, [w]: { ...p[w], today: e.target.value } }))
-                }
-              />
-            </div>
-            <div className="c-day">
-              <textarea
-                className="ta"
-                value={rows[w].tomorrow}
-                onChange={(e) =>
-                  setRows((p) => ({ ...p, [w]: { ...p[w], tomorrow: e.target.value } }))
-                }
-              />
-            </div>
+            <div className="c-area">{w}</div>
+            <textarea
+              className="ta"
+              value={rows[w].today}
+              onChange={(e) =>
+                setRows((p) => ({ ...p, [w]: { ...p[w], today: e.target.value } }))
+              }
+            />
+            <textarea
+              className="ta"
+              value={rows[w].tomorrow}
+              onChange={(e) =>
+                setRows((p) => ({ ...p, [w]: { ...p[w], tomorrow: e.target.value } }))
+              }
+            />
           </div>
         ))}
       </div>
@@ -158,12 +140,8 @@ export default function DailyTable({ name, baseDate }: Props) {
       </div>
 
       <div className="nav-wrap">
-        <button className="nav-btn prev" onClick={() => setCurrentDate((d) => shiftYYMMDD(d, -1))}>
-          ◀ 이전
-        </button>
-        <button className="nav-btn next" onClick={() => setCurrentDate((d) => shiftYYMMDD(d, +1))}>
-          다음 ▶
-        </button>
+        <button className="nav-btn" onClick={() => setCurrentDate((d) => shift(d, -1))}>◀ 이전</button>
+        <button className="nav-btn" onClick={() => setCurrentDate((d) => shift(d, +1))}>다음 ▶</button>
       </div>
 
       <div className="save-wrap">
