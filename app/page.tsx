@@ -1,6 +1,7 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import DailyTable from '@/components/DailyTable';
 
 function yyyymmdd(date: Date) {
   const y = date.getFullYear().toString().slice(-2);
@@ -10,50 +11,68 @@ function yyyymmdd(date: Date) {
 }
 
 export default function Page() {
-  const [name, setName] = useState('');
   const today = new Date();
   const todayLabel = `${today.getFullYear()}.${today.getMonth() + 1}.${today.getDate()}`;
-  const loginDate = yyyymmdd(today);
+  const todayYYMMDD = yyyymmdd(today);
 
-  async function handleLogin() {
+  const [name, setName] = useState('');
+  const [baseDate, setBaseDate] = useState(todayYYMMDD);
+  const [logged, setLogged] = useState(false);
+
+  async function login() {
     if (!name.trim()) return alert('이름을 입력하세요.');
 
-    await supabase.from('login_users').insert({
-      name,
-      login_date: loginDate,
-    });
+    // 로그인 기록 저장
+    await supabase.from('login_users').insert({ name, login_date: todayYYMMDD });
 
     localStorage.setItem('name', name);
-    localStorage.setItem('baseDate', loginDate);
-    window.location.reload();
+    localStorage.setItem('baseDate', todayYYMMDD);
+    setLogged(true);
+  }
+
+  useEffect(() => {
+    const n = localStorage.getItem('name');
+    const d = localStorage.getItem('baseDate');
+    if (n && d) {
+      setName(n);
+      setBaseDate(d);
+      setLogged(true);
+    }
+  }, []);
+
+  function logout() {
+    localStorage.clear();
+    setLogged(false);
+  }
+
+  if (!logged) {
+    return (
+      <div className="login-wrap">
+        <img src="/goe.png" className="login-top-logo" />
+        <h1 className="login-title">일일 업무 로그인</h1>
+        <div className="login-date">오늘 날짜 : {todayLabel}</div>
+
+        <input
+          className="login-input"
+          placeholder="이름을 입력하세요"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && login()}
+        />
+        <button className="login-btn" onClick={login}>로그인</button>
+
+        <img src="/itcen.png" className="login-bottom-logo" />
+      </div>
+    );
   }
 
   return (
-    <div className="login-wrap">
+    <div className="wrap">
+      <div className="topbar">
+        <button className="logout-btn" onClick={logout}>로그아웃</button>
+      </div>
 
-      {/* 상단 로고 */}
-      <img src="/goe.png" alt="경기도교육청" className="login-top-logo" />
-
-      {/* 제목 */}
-      <h1 className="login-title">일일업무 로그인</h1>
-
-      {/* 오늘 날짜 */}
-      <div className="login-date">오늘 날짜 : {todayLabel}</div>
-
-      {/* 입력창 */}
-      <input
-        className="login-input"
-        placeholder="이름을 입력하세요"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
-      />
-
-      {/* 버튼 */}
-      <button className="login-btn" onClick={handleLogin}>로그인</button>
-
-      {/* 하단 로고 */}
-      <img src="/itcen.png" alt="ITCEN" className="login-bottom-logo" />
+      <DailyTable name={name} baseDate={baseDate} />
     </div>
   );
 }
