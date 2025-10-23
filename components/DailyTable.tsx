@@ -1,51 +1,76 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { WORK_TYPES, type WorkType, MEETING_TYPE } from '@/utils/workTypes';
 
 interface Props {
   name: string;
-  baseDate: string;
+  baseDate: string; // 초기값(오늘)
 }
 
 type RowState = {
   [key in WorkType]: { today: string; tomorrow: string };
 };
 
+function shiftYYMMDD(yyMMdd: string, deltaDays: number) {
+  const y = Number('20' + yyMMdd.slice(0, 2));
+  const m = Number(yyMMdd.slice(2, 4)) - 1;
+  const d = Number(yyMMdd.slice(4, 6));
+  const dt = new Date(y, m, d);
+  dt.setDate(dt.getDate() + deltaDays);
+  const yy = dt.getFullYear().toString().slice(-2);
+  const mm = String(dt.getMonth() + 1).padStart(2, '0');
+  const dd = String(dt.getDate()).padStart(2, '0');
+  return `${yy}${mm}${dd}`;
+}
+
 export default function DailyTable({ name, baseDate }: Props) {
+  // 화면 내에서 기준일 이동을 위한 state
+  const [currentDate, setCurrentDate] = useState(baseDate);
+
   const [rows, setRows] = useState<RowState>(() => {
     const init: any = {};
     WORK_TYPES.forEach((w) => (init[w] = { today: '', tomorrow: '' }));
     return init as RowState;
   });
-
   const [meeting, setMeeting] = useState({ today: '', tomorrow: '' });
 
-  async function loadAll() {
-    const { data } = await supabase
+  // 가독용: 20YY-MM-DD 표기
+  const currentDateLabel = useMemo(() => {
+    const dt = new Date(
+      Number('20' + currentDate.slice(0, 2)),
+      Number(currentDate.slice(2, 4)) - 1,
+      Number(currentDate.slice(4, 6))
+    );
+    return dt.toLocaleDateString();
+  }, [currentDate]);
+
+  async function loadAll(targetDate: string) {
+    const { data, error } = await supabase
       .from('memos')
       .select('*')
       .eq('name', name)
-      .eq('base_date', baseDate);
+      .eq('base_date', targetDate);
 
     const nextRows: any = {};
     WORK_TYPES.forEach((w) => (nextRows[w] = { today: '', tomorrow: '' }));
 
-    data?.forEach((row) => {
-      if (WORK_TYPES.includes(row.work_type)) {
-        nextRows[row.work_type] = {
-          today: row.today_content || '',
-          tomorrow: row.tomorrow_content || '',
-        };
-      }
-      if (row.work_type === MEETING_TYPE) {
-        setMeeting({
-          today: row.today_content || '',
-          tomorrow: row.tomorrow_content || '',
-        });
-      }
-    });
-
+    if (!error && data) {
+      data.forEach((row) => {
+        if (WORK_TYPES.includes(row.work_type)) {
+          nextRows[row.work_type] = {
+            today: row.today_content || '',
+            tomorrow: row.tomorrow_content || '',
+          };
+        }
+        if (row.work_type === MEETING_TYPE) {
+          setMeeting({
+            today: row.today_content || '',
+            tomorrow: row.tomorrow_content || '',
+          });
+        }
+      });
+    }
     setRows(nextRows);
   }
 
@@ -54,7 +79,7 @@ export default function DailyTable({ name, baseDate }: Props) {
       ...WORK_TYPES.map((w) =>
         supabase.from('memos').upsert({
           name,
-          base_date: baseDate,
+          base_date: currentDate,
           work_type: w,
           today_content: rows[w].today,
           tomorrow_content: rows[w].tomorrow,
@@ -62,7 +87,7 @@ export default function DailyTable({ name, baseDate }: Props) {
       ),
       supabase.from('memos').upsert({
         name,
-        base_date: baseDate,
+        base_date: currentDate,
         work_type: MEETING_TYPE,
         today_content: meeting.today,
         tomorrow_content: meeting.tomorrow,
@@ -72,14 +97,23 @@ export default function DailyTable({ name, baseDate }: Props) {
   }
 
   useEffect(() => {
-    loadAll();
-  }, [name, baseDate]);
+    setCurrentDate(baseDate); // 로그인 후 초기화
+  }, [baseDate]);
+
+  useEffect(() => {
+    loadAll(currentDate);
+  }, [name, currentDate]);
 
   return (
     <>
-      <img src="/goe.png" className="goe-main-logo" />
+      {/* 로고 1줄 + 제목 1줄 (좌측 정렬) */}
+      <img src="/goe.png" className="goe-main-logo" alt="경기도교육청 로고" />
       <h1 className="title-left">경기도교육청 정보자원 일일업무내용</h1>
 
+      {/* 기준일(내부 표기용) */}
+      <div className="date-hint">{currentDateLabel} (YYMMDD: {currentDate})</div>
+
+      {/* 테이블 */}
       <div className="sheet">
         <div className="sheet-header">
           <div className="c-area">업무분야</div>
@@ -90,7 +124,9 @@ export default function DailyTable({ name, baseDate }: Props) {
         {WORK_TYPES.map((w) => (
           <div className="sheet-row" key={w}>
             <div className="c-area"><strong>{w}</strong></div>
+
             <div className="c-day">
+              <div className="cell-label">오늘</div>{/* 모바일에서 라벨 유지 */}
               <textarea
                 className="ta"
                 value={rows[w].today}
@@ -99,7 +135,9 @@ export default function DailyTable({ name, baseDate }: Props) {
                 }
               />
             </div>
+
             <div className="c-day">
+              <div className="cell-label">내일</div>{/* 모바일에서 라벨 유지 */}
               <textarea
                 className="ta"
                 value={rows[w].tomorrow}
@@ -112,6 +150,7 @@ export default function DailyTable({ name, baseDate }: Props) {
         ))}
       </div>
 
+      {/* 회의/협의 */}
       <div className="meeting">
         <div className="meeting-head">회의/협의 일정</div>
         <div className="meeting-grid">
@@ -134,10 +173,28 @@ export default function DailyTable({ name, baseDate }: Props) {
         </div>
       </div>
 
+      {/* 날짜 이동 (B2: 테이블·회의 아래) — L2 문구, C1 색상 */}
+      <div className="nav-wrap">
+        <button
+          className="nav-btn prev"
+          onClick={() => setCurrentDate((d) => shiftYYMMDD(d, -1))}
+        >
+          ◀ 이전
+        </button>
+        <button
+          className="nav-btn next"
+          onClick={() => setCurrentDate((d) => shiftYYMMDD(d, +1))}
+        >
+          다음 ▶
+        </button>
+      </div>
+
+      {/* 저장 버튼 */}
       <div className="save-wrap">
         <button className="save-btn" onClick={saveAll}>전체 저장</button>
       </div>
 
+      {/* 조회자 */}
       <div className="viewer">조회자 : {name}</div>
     </>
   );
