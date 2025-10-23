@@ -14,22 +14,28 @@ export default function Page() {
   const [name, setName] = useState('');
   const [loggedIn, setLoggedIn] = useState(false);
 
-  async function login() {
+  async function login(e?: React.FormEvent) {
+    if (e) e.preventDefault(); // 엔터 시 리프레시 방지
+
     const userName = name.trim();
-    if (!userName) return alert('이름을 입력하세요');
-
-    // DB 화이트리스트 검증
-    const { data, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('name', userName)
-      .single();
-
-    if (error || !data) {
-      alert('등록된 사용자만 로그인 가능합니다.');
+    if (!userName) {
+      alert('이름을 입력하세요');
       return;
     }
 
+    // DB에서 사용자 존재 여부 확인
+    const { data, error } = await supabase
+      .from('users')
+      .select('name')
+      .eq('name', userName)
+      .maybeSingle(); // 값 없으면 null 반환
+
+    if (!data || error) {
+      alert('사용자가 등록되지 않았습니다.');
+      return;
+    }
+
+    // 로그인 성공
     localStorage.setItem('name', userName);
     setLoggedIn(true);
   }
@@ -45,20 +51,24 @@ export default function Page() {
         <img src="/goe.png" className="login-logo" alt="경기도교육청 로고" />
         <div className="login-box">
           <h2>일일업무 로그인</h2>
-          <input
-            className="login-input"
-            placeholder="이름을 입력하세요"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <button className="login-btn" onClick={login}>로그인</button>
+
+          <form onSubmit={login}>
+            <input
+              className="login-input"
+              placeholder="이름을 입력하세요"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              autoFocus
+            />
+            <button type="submit" className="login-btn">로그인</button>
+          </form>
         </div>
         <img src="/itcen.png" className="login-footer-logo" alt="아이티센 로고" />
       </div>
     );
   }
 
-  // 기준일: 오늘 (이동 버튼은 테이블 하단에서 제어)
+  // 기준일: 오늘 (테이블 내부에서 이동 제어)
   const baseDate = yyyymmdd(new Date());
 
   return (
