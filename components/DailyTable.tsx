@@ -103,7 +103,7 @@ export default function DailyTable({ name, baseDate }: Props) {
 
   return (
     <>
-      {/* 상단 로고 (3배 확대, 중앙정렬) */}
+      {/* 로고 */}
       <div className="logo-wrap">
         <img src="/goe.png" className="goe-main-logo" alt="경기도교육청 로고" />
       </div>
@@ -111,7 +111,7 @@ export default function DailyTable({ name, baseDate }: Props) {
       {/* 제목 */}
       <h1 className="title-center">정보자원통합 일일현황</h1>
 
-      {/* 날짜 (중앙 정렬, 2배, bold) */}
+      {/* 날짜 */}
       <div className="date-strong">오늘날짜 : {currentDateLabel}</div>
 
       {/* 테이블 */}
@@ -125,9 +125,7 @@ export default function DailyTable({ name, baseDate }: Props) {
         {WORK_TYPES.map((w) => (
           <div className="sheet-row" key={w}>
             <div className="c-area"><strong>{w}</strong></div>
-
             <div className="c-day">
-              <div className="cell-label">오늘</div>
               <textarea
                 className="ta"
                 value={rows[w].today}
@@ -136,9 +134,7 @@ export default function DailyTable({ name, baseDate }: Props) {
                 }
               />
             </div>
-
             <div className="c-day">
-              <div className="cell-label">내일</div>
               <textarea
                 className="ta"
                 value={rows[w].tomorrow}
@@ -151,12 +147,11 @@ export default function DailyTable({ name, baseDate }: Props) {
         ))}
       </div>
 
-      {/* 회의/협의 */}
+      {/* 회의 */}
       <div className="meeting">
         <div className="meeting-head">회의/협의 일정</div>
         <div className="meeting-grid">
           <div>
-            <label className="lb">오늘</label>
             <textarea
               className="ta"
               value={meeting.today}
@@ -164,7 +159,6 @@ export default function DailyTable({ name, baseDate }: Props) {
             />
           </div>
           <div>
-            <label className="lb">내일</label>
             <textarea
               className="ta"
               value={meeting.tomorrow}
@@ -174,27 +168,22 @@ export default function DailyTable({ name, baseDate }: Props) {
         </div>
       </div>
 
-      {/* 날짜 이동 버튼 */}
+      {/* 날짜 이동 */}
       <div className="nav-wrap">
-        <button
-          className="nav-btn prev"
-          onClick={() => setCurrentDate((d) => shiftYYMMDD(d, -1))}
-        >
+        <button className="nav-btn prev" onClick={() => setCurrentDate((d) => shiftYYMMDD(d, -1))}>
           ◀ 이전
         </button>
-        <button
-          className="nav-btn next"
-          onClick={() => setCurrentDate((d) => shiftYYMMDD(d, +1))}
-        >
+        <button className="nav-btn next" onClick={() => setCurrentDate((d) => shiftYYMMDD(d, +1))}>
           다음 ▶
         </button>
       </div>
 
-      {/* 저장 버튼 (크기 1/2로 축소) */}
+      {/* 저장 */}
       <div className="save-wrap">
         <button className="save-btn-small" onClick={saveAll}>저장</button>
       </div>
 
+      {/* 조회자 */}
       <div className="viewer">조회자 : {name}</div>
     </>
   );
