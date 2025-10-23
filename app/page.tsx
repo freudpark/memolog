@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import DailyTable from '@/components/DailyTable';
+import { supabase } from '@/lib/supabase';
 
 function yyyymmdd(date: Date) {
   const y = date.getFullYear().toString().slice(-2);
@@ -11,68 +11,49 @@ function yyyymmdd(date: Date) {
 
 export default function Page() {
   const [name, setName] = useState('');
-  const [loggedIn, setLoggedIn] = useState(false);
-
   const today = new Date();
-  const baseDate = yyyymmdd(today);
-  const fullDate = today.toLocaleDateString();
+  const todayLabel = `${today.getFullYear()}.${today.getMonth() + 1}.${today.getDate()}`;
+  const loginDate = yyyymmdd(today);
 
-  // ✅ 인증 없이 로그인
-  function login(e?: React.FormEvent) {
-    if (e) e.preventDefault();
+  async function handleLogin() {
+    if (!name.trim()) return alert('이름을 입력하세요.');
 
-    const userName = name.trim();
-    if (!userName) {
-      alert('이름을 입력하세요');
-      return;
-    }
+    await supabase.from('login_users').insert({
+      name,
+      login_date: loginDate,
+    });
 
-    localStorage.setItem('name', userName);
-    setLoggedIn(true);
+    localStorage.setItem('name', name);
+    localStorage.setItem('baseDate', loginDate);
+    window.location.reload();
   }
 
-  // ✅ 로그아웃
-  function logout() {
-    localStorage.removeItem('name');
-    setLoggedIn(false);
-  }
-
-  // ✅ 로그인 화면
-  if (!loggedIn) {
-    return (
-      <div className="login-wrap">
-        <img src="/goe.png" className="login-logo" alt="경기도교육청 로고" />
-        <div className="login-box">
-          <h2>일일업무 로그인</h2>
-          <div style={{ fontSize: '13px', color: '#555', marginBottom: '8px' }}>
-            기준일자 : {fullDate} (YYMMDD: {baseDate})
-          </div>
-
-          <form onSubmit={login}>
-            <input
-              className="login-input"
-              placeholder="이름을 입력하세요"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              autoFocus
-            />
-            <button type="submit" className="login-btn">
-              로그인
-            </button>
-          </form>
-        </div>
-        <img src="/itcen.png" className="login-footer-logo" alt="아이티센 로고" />
-      </div>
-    );
-  }
-
-  // ✅ 메인 화면
   return (
-    <div className="wrap">
-      <DailyTable name={name} baseDate={baseDate} />
-      <div style={{ textAlign: 'right', marginTop: 12 }}>
-        <button onClick={logout}>로그아웃</button>
-      </div>
+    <div className="login-wrap">
+
+      {/* 상단 로고 */}
+      <img src="/goe.png" alt="경기도교육청" className="login-top-logo" />
+
+      {/* 제목 */}
+      <h1 className="login-title">일일업무 로그인</h1>
+
+      {/* 오늘 날짜 */}
+      <div className="login-date">오늘 날짜 : {todayLabel}</div>
+
+      {/* 입력창 */}
+      <input
+        className="login-input"
+        placeholder="이름을 입력하세요"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
+      />
+
+      {/* 버튼 */}
+      <button className="login-btn" onClick={handleLogin}>로그인</button>
+
+      {/* 하단 로고 */}
+      <img src="/itcen.png" alt="ITCEN" className="login-bottom-logo" />
     </div>
   );
 }
