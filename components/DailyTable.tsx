@@ -77,47 +77,72 @@ export default function DailyTable({ name, baseDate }: Props) {
 
   return (
     <>
+      {/* 제목 */}
+      <h1 className="title-center">경기도교육청 정보자원 일일업무내용</h1>
+
+      {/* 테이블 */}
       <div className="sheet">
         <div className="sheet-header">
-          <div>업무분야</div>
-          <div>오늘</div>
-          <div>내일</div>
+          <div className="c-area">업무분야</div>
+          <div className="c-day">오늘</div>
+          <div className="c-day">내일</div>
         </div>
 
         {WORK_TYPES.map((w) => (
           <div className="sheet-row" key={w}>
-            <div className="area-td"><strong>{w}</strong></div>
-            <textarea
-              className="ta"
-              value={rows[w].today}
-              onChange={(e) => setRows((p) => ({ ...p, [w]: { ...p[w], today: e.target.value } }))}
-            />
-            <textarea
-              className="ta"
-              value={rows[w].tomorrow}
-              onChange={(e) => setRows((p) => ({ ...p, [w]: { ...p[w], tomorrow: e.target.value } }))}
-            />
+            <div className="c-area"><strong>{w}</strong></div>
+            <div className="c-day">
+              <textarea
+                className="ta"
+                value={rows[w].today}
+                onChange={(e) =>
+                  setRows((p) => ({ ...p, [w]: { ...p[w], today: e.target.value } }))
+                }
+              />
+            </div>
+            <div className="c-day">
+              <textarea
+                className="ta"
+                value={rows[w].tomorrow}
+                onChange={(e) =>
+                  setRows((p) => ({ ...p, [w]: { ...p[w], tomorrow: e.target.value } }))
+                }
+              />
+            </div>
           </div>
         ))}
       </div>
 
+      {/* 회의/협의 */}
       <div className="meeting">
         <div className="meeting-head">회의/협의 일정</div>
         <div className="meeting-grid">
           <div>
             <label className="lb">오늘</label>
-            <textarea className="ta" value={meeting.today} onChange={(e) => setMeeting((p) => ({ ...p, today: e.target.value }))} />
+            <textarea
+              className="ta"
+              value={meeting.today}
+              onChange={(e) => setMeeting((p) => ({ ...p, today: e.target.value }))}
+            />
           </div>
           <div>
             <label className="lb">내일</label>
-            <textarea className="ta" value={meeting.tomorrow} onChange={(e) => setMeeting((p) => ({ ...p, tomorrow: e.target.value }))} />
+            <textarea
+              className="ta"
+              value={meeting.tomorrow}
+              onChange={(e) => setMeeting((p) => ({ ...p, tomorrow: e.target.value }))}
+            />
           </div>
         </div>
       </div>
 
-      <div style={{ marginTop: 16, textAlign: 'right' }}>
-        <button className="btn" onClick={saveAll}>전체 저장</button>
+      {/* 저장 버튼 */}
+      <div className="save-wrap">
+        <button className="save-btn" onClick={saveAll}>전체 저장</button>
       </div>
+
+      {/* 조회자 */}
+      <div className="viewer">조회자 : {name}</div>
     </>
   );
 }
