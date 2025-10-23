@@ -16,17 +16,17 @@ body {
   margin-top: 8px;
 }
 .goe-main-logo {
-  width: 180px;  /* 기존 대비 약 3배 */
+  width: 180px;  /* 3배 확대 */
   margin-bottom: 10px;
 }
 .title-center {
-  font-size: 32px;       /* S2 반영 */
+  font-size: 32px;  /* 제목 S2 */
   font-weight: 700;
   text-align: center;
   margin: 0 0 6px 0;
 }
 .date-strong {
-  font-size: 24px;       /* 2배 */
+  font-size: 24px;  /* 2배 */
   font-weight: 700;
   text-align: center;
   margin-bottom: 16px;
@@ -50,11 +50,11 @@ body {
   font-weight: 700;
   font-size: 16px;
   text-align: center;
-  padding-top: 16px;      /* 상하 2배 */
+  padding-top: 16px;
   padding-bottom: 16px;
 }
 .sheet-row > div {
-  padding: 24px 12px;     /* 상하 2배 */
+  padding: 24px 12px;
 }
 .c-area {
   text-align: center;
@@ -65,12 +65,6 @@ body {
   display: flex;
   flex-direction: column;
   gap: 6px;
-}
-.cell-label {
-  display: none;
-  font-size: 12px;
-  color: #6b7280;
-  margin-top: 2px;
 }
 .ta {
   width: 100%;
@@ -85,7 +79,7 @@ body {
 /* ====== 회의/협의 ====== */
 .meeting {
   background: white;
-  padding: 20px;                  /* 상하 2배 */
+  padding: 20px;
   border-radius: 12px;
   margin-top: 18px;
 }
@@ -97,12 +91,6 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-}
-.lb {
-  font-size: 12px;
-  color: #6b7280;
-  display: block;
-  margin-bottom: 6px;
 }
 
 /* ====== 날짜 네비게이션 ====== */
@@ -135,8 +123,8 @@ body {
   margin-top: 12px;
 }
 .save-btn-small {
-  width: 150px;         /* 기존 대비 가로 1/2 */
-  height: 40px;         /* 기존 대비 세로 1/2 */
+  width: 150px;
+  height: 40px;
   background: #111827;
   color: white;
   font-size: 14px;
@@ -151,7 +139,8 @@ body {
 /* ====== 조회자 ====== */
 .viewer {
   margin-top: 10px;
-  font-size: 14px;
+  font-size: 14px; /* S1 */
+  text-align: left;
 }
 
 /* ====== 반응형 ====== */
@@ -164,8 +153,5 @@ body {
   }
   .meeting-grid {
     grid-template-columns: 1fr;
-  }
-  .cell-label {
-    display: block;
   }
 }
