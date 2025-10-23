@@ -1,44 +1,88 @@
-:root { color-scheme: light; }
-html, body { height: 100%; }
-body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Apple SD Gothic Neo, Noto Sans KR, sans-serif; background: #f6f7fb; }
-* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: #f7f7f7;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen;
+}
 
-/* 컨테이너/공통 */
-.container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-.footer { color:#6b7280; font-size:12px; text-align:center; margin-top:24px; }
+.sheet {
+  width: 100%;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+}
 
-/* 로그인 (중앙 카드) */
-.login-wrap { display:flex; align-items:center; justify-content:center; min-height: 60vh; }
-.card { background:#fff; border:1px solid #e5e7eb; border-radius: 16px; padding: 20px; box-shadow: 0 6px 24px rgba(15,23,42,0.06); width: 100%; max-width: 560px; }
-.card h2 { margin: 0 0 12px; font-size: 22px; }
-.input { padding: 12px 14px; border-radius: 12px; border: 1px solid #e5e7eb; width: 100%; }
-.row { display: flex; gap: 12px; }
-.btn { padding: 10px 14px; border: 1px solid #1f2937; background:#111827; color:#fff; border-radius: 12px; cursor:pointer; }
-.btn:disabled { opacity: 0.6; cursor: not-allowed; }
-.lb { display:block; font-size:12px; color:#6b7280; margin-bottom:6px; }
+/* ✅ Grid : 1 : 3 : 3 */
+.sheet-header, .sheet-row {
+  display: grid;
+  grid-template-columns: minmax(110px, 1fr) 3fr 3fr;
+  border-bottom: 1px solid #ddd;
+}
 
-/* 모던 테이블 (옵션 2) */
-.sheet { background:#fff; border:1px solid #e5e7eb; border-radius: 16px; overflow: hidden; box-shadow: 0 6px 24px rgba(15,23,42,0.06); }
-.sheet-header { display:grid; grid-template-columns: 220px 1fr 1fr; background:#f9fafb; border-bottom:1px solid #e5e7eb; }
-.sheet-header > div { padding:12px 14px; font-weight:600; }
-.sheet-row { display:grid; grid-template-columns: 220px 1fr 1fr auto; border-bottom:1px solid #f1f5f9; }
-.sheet-row > div { padding:12px 14px; }
-.c-area { background:#fcfcfd; }
-.c-actions { display:flex; flex-direction:column; gap:8px; align-items:flex-end; padding-right:16px; }
-.stamp { font-size:11px; color:#6b7280; }
+/* ✅ 헤더 크고, 굵고, 센터 */
+.sheet-header {
+  background: #f1f1f1;
+  font-weight: 700;
+  font-size: 16px;
+  text-align: center;
+  padding: 12px 0;
+}
 
-.ta { width:100%; min-height:90px; padding:10px 12px; border:1px solid #e5e7eb; border-radius:12px; resize: vertical; }
+.area-td {
+  text-align: center;
+  font-weight: 700;
+  font-size: 16px;
+  padding: 12px;
+}
 
-/* 회의/협의 */
-.meeting { margin-top: 16px; background:#fff; border:1px solid #e5e7eb; border-radius: 16px; box-shadow: 0 6px 24px rgba(15,23,42,0.06); }
-.meeting-head { padding:12px 14px; font-weight:700; border-bottom:1px solid #f1f5f9; background:#f9fafb; }
-.meeting-grid { display:grid; grid-template-columns: 1fr 1fr auto; gap: 12px; padding:12px 14px; align-items:start; }
+textarea.ta {
+  width: 100%;
+  border: none;
+  border-left: 1px solid #eee;
+  padding: 12px;
+  font-size: 14px;
+  resize: vertical;           /* ✅ H2 반영 */
+  outline: none;
+}
 
-/* 반응형: 모바일 1열 전환 */
-@media (max-width: 900px) {
-  .sheet-header { display:none; }
-  .sheet-row { grid-template-columns: 1fr; }
-  .c-area { border-bottom:1px solid #f3f4f6; padding-bottom:8px; margin-bottom:8px; }
-  .c-actions { align-items:flex-start; }
-  .meeting-grid { grid-template-columns: 1fr; }
+/* ✅ 나머지는 좌측 정렬 */
+.sheet-row textarea {
+  text-align: left;
+}
+
+.meeting {
+  background: white;
+  padding: 12px;
+  border-radius: 10px;
+  margin-top: 16px;
+}
+
+.meeting-head {
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.meeting-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* ✅ 버튼 */
+button.btn {
+  background: black;
+  color: white;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* ✅ 반응형 (모바일 1열) */
+@media(max-width: 600px) {
+  .sheet-header, .sheet-row {
+    grid-template-columns: 1fr;
+  }
+  .meeting-grid {
+    grid-template-columns: 1fr;
+  }
 }
