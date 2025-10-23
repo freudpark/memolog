@@ -39,7 +39,10 @@ export default function DailyTable({ name, baseDate }: Props) {
         };
       }
       if (row.work_type === MEETING_TYPE) {
-        setMeeting({ today: row.today_content || '', tomorrow: row.tomorrow_content || '' });
+        setMeeting({
+          today: row.today_content || '',
+          tomorrow: row.tomorrow_content || '',
+        });
       }
     });
 
@@ -76,33 +79,28 @@ export default function DailyTable({ name, baseDate }: Props) {
     <>
       <div className="sheet">
         <div className="sheet-header">
-          <div className="c-area">업무분야</div>
-          <div className="c-day">오늘</div>
-          <div className="c-day">내일</div>
+          <div>업무분야</div>
+          <div>오늘</div>
+          <div>내일</div>
         </div>
 
         {WORK_TYPES.map((w) => (
           <div className="sheet-row" key={w}>
-            <div className="c-area"><strong>{w}</strong></div>
-            <div className="c-day">
-              <textarea
-                className="ta"
-                value={rows[w].today}
-                onChange={(e) => setRows((p) => ({ ...p, [w]: { ...p[w], today: e.target.value } }))}
-              />
-            </div>
-            <div className="c-day">
-              <textarea
-                className="ta"
-                value={rows[w].tomorrow}
-                onChange={(e) => setRows((p) => ({ ...p, [w]: { ...p[w], tomorrow: e.target.value } }))}
-              />
-            </div>
+            <div className="area-td"><strong>{w}</strong></div>
+            <textarea
+              className="ta"
+              value={rows[w].today}
+              onChange={(e) => setRows((p) => ({ ...p, [w]: { ...p[w], today: e.target.value } }))}
+            />
+            <textarea
+              className="ta"
+              value={rows[w].tomorrow}
+              onChange={(e) => setRows((p) => ({ ...p, [w]: { ...p[w], tomorrow: e.target.value } }))}
+            />
           </div>
         ))}
       </div>
 
-      {/* 회의/협의 (M1) */}
       <div className="meeting">
         <div className="meeting-head">회의/협의 일정</div>
         <div className="meeting-grid">
@@ -117,7 +115,6 @@ export default function DailyTable({ name, baseDate }: Props) {
         </div>
       </div>
 
-      {/* 전체 저장 버튼 */}
       <div style={{ marginTop: 16, textAlign: 'right' }}>
         <button className="btn" onClick={saveAll}>전체 저장</button>
       </div>
