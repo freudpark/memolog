@@ -1,64 +1,104 @@
+:root {
+  color-scheme: light;
+}
+
+html, body {
+  height: 100%;
+}
+
 body {
   margin: 0;
-  background: #f7f7f7;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Apple SD Gothic Neo, Noto Sans KR, sans-serif;
+  background: #f6f7fb;
 }
 
+* {
+  box-sizing: border-box;
+}
+
+/* 컨테이너 */
+.wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* 상단 사용자 정보 */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.05);
+  margin-bottom: 18px;
+  font-size: 16px;
+}
+
+/* 테이블 영역 */
 .sheet {
-  width: 100%;
-  background: white;
-  border-radius: 10px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
   overflow: hidden;
+  box-shadow: 0 6px 24px rgba(15,23,42,0.06);
 }
 
-/* ✅ Grid : 1 : 3 : 3 */
-.sheet-header, .sheet-row {
-  display: grid;
-  grid-template-columns: minmax(110px, 1fr) 3fr 3fr;
-  border-bottom: 1px solid #ddd;
-}
-
-/* ✅ 헤더 크고, 굵고, 센터 */
 .sheet-header {
-  background: #f1f1f1;
-  font-weight: 700;
-  font-size: 16px;
+  display: grid;
+  grid-template-columns: 220px 1fr 1fr;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
   text-align: center;
-  padding: 12px 0;
+  font-size: 16px;
+  font-weight: 700;
+  padding: 14px 0;
 }
 
-.area-td {
+.sheet-row {
+  display: grid;
+  grid-template-columns: 220px 1fr 1fr;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.sheet-row > div {
+  padding: 12px 14px;
+}
+
+.sheet-row .c-area {
   text-align: center;
+  font-size: 15px;
   font-weight: 700;
-  font-size: 16px;
-  padding: 12px;
 }
 
 textarea.ta {
   width: 100%;
-  border: none;
-  border-left: 1px solid #eee;
+  min-height: 95px;
   padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  resize: vertical;
   font-size: 14px;
-  resize: vertical;           /* ✅ H2 반영 */
-  outline: none;
-}
-
-/* ✅ 나머지는 좌측 정렬 */
-.sheet-row textarea {
   text-align: left;
 }
 
+/* 회의/협의 */
 .meeting {
-  background: white;
-  padding: 12px;
-  border-radius: 10px;
-  margin-top: 16px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 16px;
+  margin-top: 18px;
+  box-shadow: 0 6px 24px rgba(15,23,42,0.06);
 }
 
 .meeting-head {
+  font-size: 17px;
   font-weight: 700;
-  margin-bottom: 10px;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .meeting-grid {
@@ -67,22 +107,51 @@ textarea.ta {
   gap: 12px;
 }
 
-/* ✅ 버튼 */
-button.btn {
-  background: black;
-  color: white;
-  padding: 10px 18px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+.lb {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 6px;
+  display: block;
 }
 
-/* ✅ 반응형 (모바일 1열) */
-@media(max-width: 600px) {
-  .sheet-header, .sheet-row {
-    grid-template-columns: 1fr;
-  }
-  .meeting-grid {
-    grid-template-columns: 1fr;
-  }
+/* 버튼 - 파란 Primary(A) */
+button.btn, button {
+  background: #2563eb;
+  color: white;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+button.btn:hover {
+  background: #1d4ed8;
+}
+
+/* 로그인 화면 정렬 */
+.login-wrap {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-box {
+  background: #fff;
+  padding: 24px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 6px 24px rgba(15,23,42,0.06);
+}
+
+/* 반응형: 모바일 1열 */
+@media (max-width: 900px) {
+  .sheet-header { display: none; }
+  .sheet-row { grid-template-columns: 1fr; }
+  .c-area { text-align: left; margin-bottom: 4px; }
+  .meeting-grid { grid-template-columns: 1fr; }
 }
